@@ -1,27 +1,32 @@
+const dotenv = require('dotenv');
+dotenv.config();
 const express = require('express');
 const cors = require('cors');
 const http = require('http');
-const { Server } = require('socket.io');
-const dotenv = require('dotenv');
+// const { Server } = require('socket.io');
 const connectDB = require('./models/config'); // Import MongoDB connection
 const authRoutes = require('./routes/authRoutes');
-const chatRoutes = require('./routes/chatRoutes');
-const errorMiddleware = require('./middlewares/errorMiddleware');
-const socketHandler = require('./sockets/socket');
+// const chatRoutes = require('./routes/chatRoutes');
+// const errorMiddleware = require('./middlewares/errorMiddleware');
+// const socketHandler = require('./sockets/socket');
+const { generatedErrors } = require('./middleware/error');
+const morgan = require('morgan');
+const cookieParser = require('cookie-parser');
 
-dotenv.config();
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server, { cors: { origin: 'http://localhost:3000' } });
+// const io = new Server(server, { cors: { origin: 'http://localhost:3000' } });
 
 // Connect to MongoDB
 connectDB();
 
 app.use(cors());
+app.use(morgan('dev'))
 app.use(express.json());
+app.use(cookieParser());
 
 // Root endpoint to confirm API is working
-app.get('/', async (req, res) => {
+app.get('/', async (_req, res) => {
   res.json({
     message: 'API is working',
     status: 'success',
@@ -30,9 +35,11 @@ app.get('/', async (req, res) => {
 });
 
 app.use('/api/auth', authRoutes);
-app.use('/api/chat', chatRoutes);
-app.use(errorMiddleware);
+// app.use('/api/chat', chatRoutes);
 
-socketHandler(io);
+// Error handling middleware should be last
+app.use(generatedErrors);
+
+// socketHandler(io);
 
 server.listen(process.env.PORT, () => console.log(`Server running on port ${process.env.PORT}`));
