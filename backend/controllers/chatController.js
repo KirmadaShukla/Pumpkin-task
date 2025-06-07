@@ -76,10 +76,6 @@ class ChatController {
     }
   });
 
-  // Fetch offline messages for the authenticated user
-  getOfflineMessages = catchAsyncErrors(async (req, res, next) => {
-    // Implementation of getOfflineMessages method
-  });
 }
 
 module.exports = new ChatController();

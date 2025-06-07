@@ -11,13 +11,10 @@ import {
 import { useDispatch, useSelector } from 'react-redux';
 import { asyncgetusers, asynclogout } from './store/actions/userAction';
 import { getRequest, postRequest } from './config/Request';
-
-
-// This is a sample user. In a real app, you'd get this from your auth context.
+import UserProfile from './UserProfile';
 
 
 const ChatUI = () => {
-  // In a real app, this list of users/contacts would come from your database.
   const dispatch = useDispatch();
   const { users } = useSelector((state) => state.user);
   const CURRENT_USER_ID = useSelector((state) => state.user.user?._id);
@@ -26,6 +23,7 @@ const ChatUI = () => {
   const [selectedContact, setSelectedContact] = useState(null);
   const [allUsers, setAllUsers] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [isProfileVisible, setIsProfileVisible] = useState(false);
   const selectedContactRef = useRef(null);
 
   useEffect(() => {
@@ -119,6 +117,7 @@ const ChatUI = () => {
 
   const handleSelectContact = async (contact) => {
     setSelectedContact(contact);
+    setIsProfileVisible(false);
     try {
       const response = await getRequest(`/api/v1/chat/messages/${contact._id}`);
       const formattedMessages = response.data.map((msg) => ({
@@ -227,7 +226,6 @@ const ChatUI = () => {
                         : ''}
                     </span>
                   </div>
-                  <p className="text-sm text-gray-600 truncate">{contact?.email}</p>
                 </div>
              
               </div>
@@ -239,11 +237,14 @@ const ChatUI = () => {
       </div>
 
       {/* Chat Area */}
-      <div className="w-3/4 flex flex-col">
+      <div className="w-3/4 flex flex-col relative overflow-hidden">
         {selectedContact ? (
           <>
             {/* Chat Header */}
-            <div className="p-4 border-b border-gray-200 flex items-center">
+            <div
+              className="p-4 border-b border-gray-200 flex items-center cursor-pointer"
+              onClick={() => setIsProfileVisible(!isProfileVisible)}
+            >
               <div className="relative w-10 h-10 mr-3">
                 <div className="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center text-white font-semibold">
                   {selectedContact.username?.charAt(0).toUpperCase()}
@@ -311,6 +312,11 @@ const ChatUI = () => {
             Select a chat to start messaging
           </div>
         )}
+        <UserProfile
+          user={selectedContact}
+          isVisible={isProfileVisible}
+          onClose={() => setIsProfileVisible(false)}
+        />
       </div>
     </div>
   );

@@ -3,8 +3,6 @@ const Message = require('../models/Chat');
 
 module.exports = (io) => {
   io.on('connection', (socket) => {
-    console.log('User connected:', socket.id);
-
     // Set user online status
     socket.on('setUser', async (userId) => {
       try {
