@@ -7,7 +7,7 @@ class ChatController {
   getUsers = catchAsyncErrors(async (req, res, next) => {
     try {
       const users = await User.find({ _id: { $ne: req.id } })
-        .select('-password -createdAt -updatedAt -email')
+        .select('-password -createdAt -updatedAt')
         .lean();
 
       const usersWithLastMessage = await Promise.all(
@@ -40,25 +40,22 @@ class ChatController {
     try {
       const { query } = req.body;
       if (!query) {
-        return res.status(400).json({ message: 'Query is required' });
+        return res.json([]);
       }
+      const searchQuery = new RegExp(query, 'i');
       const users = await User.find({
-        $or: [{ email: query }, { mobile: query }],
-        _id: { $ne: req.user.id }, // Exclude the current user
-      }).select('email mobile');
+        $and: [
+          { _id: { $ne: req.id } },
+          {
+            $or: [
+              { email: { $regex: searchQuery } },
+              { mobile: { $regex: searchQuery } },
+              { username: { $regex: searchQuery } },
+            ],
+          },
+        ],
+      }).select('-password -createdAt -updatedAt');
       res.json(users);
-    } catch (error) {
-      next(error);
-    }
-  });
-
-  // Fetch offline messages for the authenticated user
-  getOfflineMessages = catchAsyncErrors(async (req, res, next) => {
-    try {
-      const messages = await Message.find({ recipient: req.user.id, delivered: false })
-        .populate('sender', 'email')
-        .sort({ timestamp: 1 });
-      res.json(messages);
     } catch (error) {
       next(error);
     }
@@ -72,11 +69,16 @@ class ChatController {
           { sender: req.id, recipient: otherUserId },
           { sender: otherUserId, recipient: req.id },
         ],
-      }).sort({ timestamp: 'asc' });
+      }).populate('sender', 'email username');
       res.json(messages);
     } catch (error) {
       next(error);
     }
+  });
+
+  // Fetch offline messages for the authenticated user
+  getOfflineMessages = catchAsyncErrors(async (req, res, next) => {
+    // Implementation of getOfflineMessages method
   });
 }
 

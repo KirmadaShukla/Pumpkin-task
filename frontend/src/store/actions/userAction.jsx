@@ -48,6 +48,7 @@ export const asyncsignup=(data)=>async(dispatch)=>{
 
 export const asynclogout = () => (dispatch) => {
     dispatch(removeUser());
+    localStorage.removeItem("token");
     showSuccessToast("Logged out successfully");
 }
 
