@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { asynclogin } from './store/actions/userAction';
 
@@ -8,10 +8,11 @@ const LoginPage = () => {
     const { loading } = useSelector(state => state.user);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-
+    const navigate=useNavigate()
     const handleSubmit = async(e) => {
         e.preventDefault();
-        await dispatch(asynclogin({ email, password }));
+
+        await dispatch(asynclogin({ email, password },navigate));
     };
     
   return (

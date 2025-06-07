@@ -2,18 +2,19 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-// import { asyncsignup } from '../../store/actions/userAction';
+import { asyncsignup } from './store/actions/userAction';
 
 const SignupPage = () => {
   const dispatch = useDispatch();
   const { loading } = useSelector(state => state.user);
-  const [name, setName] = useState('');
+  const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [mobile, setMobile] = useState('');
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // dispatch(asyncsignup({ name, email, password }));
+    dispatch(asyncsignup({ username, email, password, mobile }));
   }
 
   return (
@@ -31,8 +32,17 @@ const SignupPage = () => {
             <input
               type="text"
               placeholder="Name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+            />
+          </div>
+          <div>
+            <input
+              type="text"
+              placeholder="Mobile"
+              value={mobile}
+              onChange={(e) => setMobile(e.target.value)}
               className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
             />
           </div>

@@ -11,6 +11,7 @@ exports.sendToken = (user, statusCode, res) => {
         .cookie('token', token, options)
         .json({
             success: true,
-            id: user._id,
+            token,
+            expiresIn: expiresInMilliseconds
         });
 };

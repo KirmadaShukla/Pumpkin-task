@@ -3,10 +3,12 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 const userSchema = new mongoose.Schema({
+  username: { type: String, required: true },
   email: { type: String, required: true, unique: true },
+  mobile: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   online: { type: Boolean, default: false },
-});
+},{timestamps:true});
 
 userSchema.pre("save", function () {
     if (!this.isModified("password")) {
@@ -28,4 +30,4 @@ userSchema.methods.getjwttoken = function () {
 
 const User = mongoose.model("User", userSchema);
 
-module.exports = { User };
+module.exports = User;

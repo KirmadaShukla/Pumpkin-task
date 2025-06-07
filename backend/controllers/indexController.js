@@ -1,4 +1,4 @@
-const { User } = require('../models/User');
+const  User  = require('../models/User');
 // const bcrypt = require('bcryptjs'); // Used in User model
 const jwt = require('jsonwebtoken');
 const { sendToken } = require('../utils/sendToken');
@@ -9,13 +9,13 @@ class AuthController {
   // Signup: Create a new user
   signup = catchAsyncErrors(async (req, res, next) => {
     try {
-      const { email, password } = req.body;
+      const { username,email, password,mobile } = req.body;
       // Check if user already exists
-      const existingUser = await User.findOne({ $or: [{ email }] });
+      const existingUser = await User.findOne({ $or: [{ email },{mobile}] });
       if (existingUser) {
         return next(new ErrorHandler('User already exit',400));
       }
-      const user = new User({ email, password });
+      const user = new User({username, email, password ,mobile});
       await user.save();
       sendToken(user, 201, res)
 
@@ -54,7 +54,7 @@ class AuthController {
   // Get current logged in user
   getCurrentUser = catchAsyncErrors(async (req, res, next) => {
     try {
-      const user = await User.findById(req.user.id);
+      const user = await User.findById(req.id);
       res.status(200).json({
         success: true,
         user,
